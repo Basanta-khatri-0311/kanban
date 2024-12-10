@@ -1,11 +1,11 @@
 
 export const getColumnsFromLocalStorage = () => {
-  const columnsData = localStorage.getItem("kanbanColumns");
-  return columnsData ? JSON.parse(columnsData) : [];
+  const savedColumns = localStorage.getItem("columns");
+  return savedColumns ? JSON.parse(savedColumns) : [];
 };
 
 export const saveColumnsToLocalStorage = (columns) => {
-  localStorage.setItem("kanbanColumns", JSON.stringify(columns));
+  localStorage.setItem("columns", JSON.stringify(columns));
 };
 
 export const removeColumnsFromLocalStorage = () => {

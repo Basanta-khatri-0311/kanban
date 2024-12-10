@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Column from "./Column";
-
-import {
-  getColumnsFromLocalStorage,
-  saveColumnsToLocalStorage,
-} from "../utils/localstorage";
+import { getColumnsFromLocalStorage, saveColumnsToLocalStorage } from "../utils/localstorage";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Kanban = () => {
   const [columns, setColumns] = useState([]);
@@ -22,7 +19,7 @@ const Kanban = () => {
 
   const addNewColumn = () => {
     const newColumn = {
-      id: columns.length,
+      id: columns.length.toString(),
       title: `Column ${columns.length + 1}`,
       tasks: [],
     };
@@ -37,14 +34,11 @@ const Kanban = () => {
   };
 
   const handleDeleteColumn = (id) => {
-    const filteredColumns = columns.filter((column) => column.id !== id);
-    const updatedColumns = filteredColumns.map((column, index) => ({
-      ...column,
-      id: index,
-      title: `Column ${index + 1}`,
-    }));
-    setColumns(updatedColumns);
-    saveColumnsToLocalStorage(updatedColumns);
+    if (window.confirm("Are you sure you want to delete this column?")) {
+      const updatedColumns = columns.filter((column) => column.id !== id);
+      setColumns(updatedColumns);
+      saveColumnsToLocalStorage(updatedColumns);
+    }
   };
 
   const handleAddTask = (columnId, taskName, taskDescription) => {
@@ -95,8 +89,43 @@ const Kanban = () => {
     setColumns(updatedColumns);
   };
 
+  const handleOnDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
+  
+    if (!destination) {
+      return; // Item was dropped outside any valid drop zone
+    }
+  
+    // Reordering the columns or tasks (you can adjust this based on your state structure)
+    const sourceColumn = columns.find((column) => column.id === source.droppableId);
+    const destinationColumn = columns.find(
+      (column) => column.id === destination.droppableId
+    );
+  
+    const sourceTasks = [...sourceColumn.tasks];
+    const destinationTasks = [...destinationColumn.tasks];
+  
+    // Moving the task
+    const [removed] = sourceTasks.splice(source.index, 1);
+    destinationTasks.splice(destination.index, 0, removed);
+  
+    // Update state with the new task order
+    const newColumns = columns.map((column) => {
+      if (column.id === source.droppableId) {
+        return { ...column, tasks: sourceTasks };
+      }
+      if (column.id === destination.droppableId) {
+        return { ...column, tasks: destinationTasks };
+      }
+      return column;
+    });
+  
+    setColumns(newColumns); // Update the state with new column order
+  };
+  
+
   return (
-    <>
+    <DragDropContext onDragEnd={handleOnDragEnd}>
       <header className="h-[80px] flex justify-between items-center p-6 bg-[#0d1117]">
         <h1 className="text-3xl md:text-5xl underline underline-offset-8 text-emerald-600">
           KANBAN-BOARD
@@ -122,22 +151,30 @@ const Kanban = () => {
             </h2>
           </div>
         ) : (
-          <div className="flex space-x-4 mt-8">
-            {columns.map((column) => (
-              <Column
-                key={column.id}
-                column={column}
-                onEditTitle={handleEditColumnTitle}
-                onDelete={() => handleDeleteColumn(column.id)}
-                onAddTask={handleAddTask}
-                onEditTask={handleEditTask}
-                onDeleteTask={handleDeleteTask}
-              />
-            ))}
-          </div>
+          columns.map((column, index) => (
+            <Droppable key={column.id} droppableId={column.id} >
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="column"
+                >
+                  <Column
+                    column={column}
+                    onEditTitle={handleEditColumnTitle}
+                    onDelete={() => handleDeleteColumn(column.id)}
+                    onAddTask={handleAddTask}
+                    onEditTask={handleEditTask}
+                    onDeleteTask={handleDeleteTask}
+                  />
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          ))
         )}
       </main>
-    </>
+    </DragDropContext>
   );
 };
 

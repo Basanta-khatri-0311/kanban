@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 const Column = ({
   column,
@@ -7,6 +8,7 @@ const Column = ({
   onAddTask,
   onEditTask,
   onDeleteTask,
+  onMoveTask, // Add this prop to handle task movement
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(column.title);
@@ -36,8 +38,8 @@ const Column = ({
       setTaskName("");
       setTaskDescription("");
       setIsAddingTask(false);
-    }else{
-      alert("Both Task Title and Description are required")
+    } else {
+      alert("Both Task Title and Description are required");
     }
   };
 
@@ -119,7 +121,7 @@ const Column = ({
             >
               Add Task
             </button>
-            
+
             <button
               onClick={() => setIsAddingTask(false)}
               className="w-full py-2 mt-2 text-red-600 hover:text-white hover:bg-red-600 border-2 border-red-600 rounded-md"
@@ -139,53 +141,70 @@ const Column = ({
         {column.tasks.length === 0 ? (
           <p className="text-gray-500 mt-6">No tasks in this column</p>
         ) : (
-          column.tasks.map((task, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-700 text-white p-2 mb-2 mt-4 rounded-md"
-            >
-              {editingTaskIdx === idx ? (
-                <div>
-                  <input
-                    type="text"
-                    value={editedTaskName}
-                    onChange={(e) => setEditedTaskName(e.target.value)}
-                    className="w-full p-2 mb-2 text-black rounded-md"
-                  />
-                  <textarea
-                    value={editedTaskDescription}
-                    onChange={(e) => setEditedTaskDescription(e.target.value)}
-                    className="w-full p-2 mb-2 text-black rounded-md"
-                  />
-                  <button
-                    onClick={handleSaveEditedTask}
-                    className="w-full py-2 bg-emerald-500 text-white rounded-md mt-2"
-                  >
-                    Save
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <h4 className="font-semibold">{task.name}</h4>
-                  <p>{task.description}</p>
-                  <div className="flex justify-between mt-2">
-                    <button
-                      onClick={() => handleEditTask(idx)}
-                      className="hover:bg-yellow-600 w-[40px] h-[40px] hover:rounded-full text-yellow-600 hover:text-white"
-                    >
-                      <i className="ri-edit-2-line text-xl"></i>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTask(idx)}
-                      className="hover:bg-red-500 w-[40px] h-[40px] hover:rounded-full text-red-600 hover:text-white "
-                    >
-                      <i className="ri-delete-bin-line text-xl"></i>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))
+          <Droppable droppableId={column.id}>
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="mt-4"
+              >
+                {column.tasks.map((task, idx) => (
+                  <Draggable key={task.name + idx} draggableId={task.name + idx} index={idx}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="bg-gray-700 text-white p-2 mb-2 mt-4 rounded-md"
+                      >
+                        {editingTaskIdx === idx ? (
+                          <div>
+                            <input
+                              type="text"
+                              value={editedTaskName}
+                              onChange={(e) => setEditedTaskName(e.target.value)}
+                              className="w-full p-2 mb-2 text-black rounded-md"
+                            />
+                            <textarea
+                              value={editedTaskDescription}
+                              onChange={(e) => setEditedTaskDescription(e.target.value)}
+                              className="w-full p-2 mb-2 text-black rounded-md"
+                            />
+                            <button
+                              onClick={handleSaveEditedTask}
+                              className="w-full py-2 bg-emerald-500 text-white rounded-md mt-2"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        ) : (
+                          <div>
+                            <h4 className="font-semibold">{task.name}</h4>
+                            <p>{task.description}</p>
+                            <div className="flex justify-between mt-2">
+                              <button
+                                onClick={() => handleEditTask(idx)}
+                                className="hover:bg-yellow-600 w-[40px] h-[40px] hover:rounded-full text-yellow-600 hover:text-white"
+                              >
+                                <i className="ri-edit-2-line text-xl"></i>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTask(idx)}
+                                className="hover:bg-red-500 w-[40px] h-[40px] hover:rounded-full text-red-600 hover:text-white "
+                              >
+                                <i className="ri-delete-bin-line text-xl"></i>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         )}
       </div>
     </div>
