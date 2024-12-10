@@ -92,35 +92,42 @@ const Kanban = () => {
   const handleOnDragEnd = (result) => {
     const { destination, source, draggableId } = result;
   
-    if (!destination) {
-      return; // Item was dropped outside any valid drop zone
+    // If no destination or dropped in the same position, do nothing
+    if (!destination || 
+        (destination.droppableId === source.droppableId && 
+         destination.index === source.index)) {
+      return;
     }
   
-    // Reordering the columns or tasks (you can adjust this based on your state structure)
-    const sourceColumn = columns.find((column) => column.id === source.droppableId);
-    const destinationColumn = columns.find(
-      (column) => column.id === destination.droppableId
+    // Create a deep copy of columns to modify
+    const newColumns = columns.map(column => ({
+      ...column,
+      tasks: [...column.tasks]
+    }));
+  
+    // Find the source and destination column indices
+    const sourceColumnIndex = newColumns.findIndex(
+      column => column.id === source.droppableId
+    );
+    const destColumnIndex = newColumns.findIndex(
+      column => column.id === destination.droppableId
     );
   
-    const sourceTasks = [...sourceColumn.tasks];
-    const destinationTasks = [...destinationColumn.tasks];
+    // Remove the dragged task from the source column
+    const [removedTask] = newColumns[sourceColumnIndex].tasks.splice(
+      source.index, 
+      1
+    );
   
-    // Moving the task
-    const [removed] = sourceTasks.splice(source.index, 1);
-    destinationTasks.splice(destination.index, 0, removed);
+    // Insert the task into the destination column at the specified index
+    newColumns[destColumnIndex].tasks.splice(
+      destination.index, 
+      0, 
+      removedTask
+    );
   
-    // Update state with the new task order
-    const newColumns = columns.map((column) => {
-      if (column.id === source.droppableId) {
-        return { ...column, tasks: sourceTasks };
-      }
-      if (column.id === destination.droppableId) {
-        return { ...column, tasks: destinationTasks };
-      }
-      return column;
-    });
-  
-    setColumns(newColumns); // Update the state with new column order
+    // Update the state with the new columns
+    setColumns(newColumns);
   };
   
 
@@ -151,7 +158,7 @@ const Kanban = () => {
             </h2>
           </div>
         ) : (
-          columns.map((column, index) => (
+          columns.map((column) => (
             <Droppable key={column.id} droppableId={column.id} >
               {(provided) => (
                 <div

@@ -46,7 +46,7 @@ const Card = ({ task, onEdit, onDelete, index }) => {
               </button>
             </div>
           ) : (
-            <div>
+            <div draggable>
               <h3 className="text-lg font-bold">{task.title}</h3>
               <p>{task.description}</p>
               <div className="flex space-x-2 mt-2">

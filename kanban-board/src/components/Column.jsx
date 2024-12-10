@@ -149,7 +149,11 @@ const Column = ({
                 className="mt-4"
               >
                 {column.tasks.map((task, idx) => (
-                  <Draggable key={task.name + idx} draggableId={task.name + idx} index={idx}>
+                  <Draggable
+                    key={`${column.id}-${task.name}-${idx}`}
+                    draggableId={`${column.id}-${task.name}-${idx}`}
+                    index={idx}
+                  >
                     {(provided) => (
                       <div
                         ref={provided.innerRef}
@@ -162,12 +166,16 @@ const Column = ({
                             <input
                               type="text"
                               value={editedTaskName}
-                              onChange={(e) => setEditedTaskName(e.target.value)}
+                              onChange={(e) =>
+                                setEditedTaskName(e.target.value)
+                              }
                               className="w-full p-2 mb-2 text-black rounded-md"
                             />
                             <textarea
                               value={editedTaskDescription}
-                              onChange={(e) => setEditedTaskDescription(e.target.value)}
+                              onChange={(e) =>
+                                setEditedTaskDescription(e.target.value)
+                              }
                               className="w-full p-2 mb-2 text-black rounded-md"
                             />
                             <button
