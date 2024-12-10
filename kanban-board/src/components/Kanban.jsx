@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Column from "./Column";
-import { getColumnsFromLocalStorage, saveColumnsToLocalStorage } from "../utils/localstorage";
+import {
+  getColumnsFromLocalStorage,
+  saveColumnsToLocalStorage,
+} from "../utils/localstorage";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Kanban = () => {
@@ -91,35 +94,37 @@ const Kanban = () => {
 
   const handleOnDragEnd = (result) => {
     const { source, destination } = result;
-  
+
     if (!destination) {
       console.log("Dropped outside a droppable area");
       return;
     }
-  
-    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
       console.log("Dropped in the same position");
       return;
     }
-  
+
     // Find source and destination columns
     const sourceColumn = columns.find((col) => col.id === source.droppableId);
-    const destinationColumn = columns.find((col) => col.id === destination.droppableId);
-  
+    const destinationColumn = columns.find(
+      (col) => col.id === destination.droppableId
+    );
+
     if (!sourceColumn || !destinationColumn) {
       console.log("Source or destination column not found");
       return;
     }
-  
+
     // Move task
     const [movedTask] = sourceColumn.tasks.splice(source.index, 1);
     destinationColumn.tasks.splice(destination.index, 0, movedTask);
-  
+
     setColumns([...columns]);
   };
-  
-  
-  
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -149,7 +154,7 @@ const Kanban = () => {
           </div>
         ) : (
           columns.map((column) => (
-            <Droppable key={column.id} droppableId={column.id} >
+            <Droppable key={column.id} droppableId={column.id}>
               {(provided) => (
                 <div
                   ref={provided.innerRef}
