@@ -4,7 +4,6 @@ import Column from "./Column";
 import {
   getColumnsFromLocalStorage,
   saveColumnsToLocalStorage,
-  removeColumnsFromLocalStorage,
 } from "../utils/localstorage";
 
 const Kanban = () => {
