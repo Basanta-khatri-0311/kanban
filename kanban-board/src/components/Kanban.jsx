@@ -4,7 +4,6 @@ import Column from "./Column";
 const Kanban = () => {
   const [columns, setColumns] = useState([]);
 
-  
   const addNewColumn = () => {
     const newColumn = {
       id: columns.length,
@@ -14,7 +13,6 @@ const Kanban = () => {
     setColumns([...columns, newColumn]);
   };
 
-  
   const handleEditColumnTitle = (id, newTitle) => {
     const updatedColumns = columns.map((column) =>
       column.id === id ? { ...column, title: newTitle } : column
@@ -22,7 +20,6 @@ const Kanban = () => {
     setColumns(updatedColumns);
   };
 
-  
   const handleDeleteColumn = (id) => {
     const filteredColumns = columns.filter((column) => column.id !== id);
     const updatedColumns = filteredColumns.map((column, index) => ({
@@ -33,24 +30,35 @@ const Kanban = () => {
     setColumns(updatedColumns);
   };
 
- 
   const handleAddTask = (columnId, taskName, taskDescription) => {
     const updatedColumns = columns.map((column) =>
       column.id === columnId
-        ? { ...column, tasks: [...column.tasks, { name: taskName, description: taskDescription }] }
+        ? {
+            ...column,
+            tasks: [
+              ...column.tasks,
+              { name: taskName, description: taskDescription },
+            ],
+          }
         : column
     );
     setColumns(updatedColumns);
   };
 
- 
-  const handleEditTask = (columnId, taskIdx, updatedName, updatedDescription) => {
+  const handleEditTask = (
+    columnId,
+    taskIdx,
+    updatedName,
+    updatedDescription
+  ) => {
     const updatedColumns = columns.map((column) =>
       column.id === columnId
         ? {
             ...column,
             tasks: column.tasks.map((task, idx) =>
-              idx === taskIdx ? { name: updatedName, description: updatedDescription } : task
+              idx === taskIdx
+                ? { name: updatedName, description: updatedDescription }
+                : task
             ),
           }
         : column
@@ -58,7 +66,6 @@ const Kanban = () => {
     setColumns(updatedColumns);
   };
 
-  n
   const handleDeleteTask = (columnId, taskIdx) => {
     const updatedColumns = columns.map((column) =>
       column.id === columnId
@@ -73,7 +80,6 @@ const Kanban = () => {
 
   return (
     <>
-     
       <header className="h-[80px] flex justify-between items-center p-6 bg-[#0d1117]">
         <h1 className="text-3xl md:text-5xl underline underline-offset-8 text-emerald-600">
           KANBAN-BOARD
@@ -86,7 +92,6 @@ const Kanban = () => {
         </button>
       </header>
 
-      
       <main
         className="flex justify-start items-start overflow-x-auto px-4 bg-[#161b22]"
         style={{
