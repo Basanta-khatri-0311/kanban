@@ -1,8 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Column from "./Column";
+
+import {
+  getColumnsFromLocalStorage,
+  saveColumnsToLocalStorage,
+  removeColumnsFromLocalStorage,
+} from "../utils/localstorage";
 
 const Kanban = () => {
   const [columns, setColumns] = useState([]);
+
+  useEffect(() => {
+    const savedColumns = getColumnsFromLocalStorage();
+    setColumns(savedColumns);
+  }, []);
+
+  useEffect(() => {
+    if (columns.length > 0) {
+      saveColumnsToLocalStorage(columns);
+    }
+  }, [columns]);
 
   const addNewColumn = () => {
     const newColumn = {
@@ -10,7 +27,7 @@ const Kanban = () => {
       title: `Column ${columns.length + 1}`,
       tasks: [],
     };
-    setColumns([...columns, newColumn]);
+    setColumns((prevColumns) => [...prevColumns, newColumn]);
   };
 
   const handleEditColumnTitle = (id, newTitle) => {
@@ -28,6 +45,7 @@ const Kanban = () => {
       title: `Column ${index + 1}`,
     }));
     setColumns(updatedColumns);
+    saveColumnsToLocalStorage(updatedColumns);
   };
 
   const handleAddTask = (columnId, taskName, taskDescription) => {
