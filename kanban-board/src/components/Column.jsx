@@ -30,7 +30,7 @@ const Column = ({
     if (e.key === "Enter") handleSaveTitle();
   };
 
-  const handleAddTask = () => {
+  const addTaskToColumn = () => {
     if (taskName.trim() && taskDescription.trim()) {
       onAddTask(column.id, taskName, taskDescription);
       setTaskName("");
@@ -114,12 +114,12 @@ const Column = ({
               className="w-full p-2 mb-2 text-white rounded-md bg-transparent border-2 border-transparent focus:border-emerald-600 focus:outline-none"
             />
             <button
-              onClick={handleAddTask}
+              onClick={addTaskToColumn}
               className="w-full py-2 bg-emerald-500 text-white rounded-md mt-2"
             >
               Add Task
             </button>
-            {/* Close button to cancel adding task */}
+            
             <button
               onClick={() => setIsAddingTask(false)}
               className="w-full py-2 mt-2 text-red-600 hover:text-white hover:bg-red-600 border-2 border-red-600 rounded-md"
