@@ -90,45 +90,35 @@ const Kanban = () => {
   };
 
   const handleOnDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { source, destination } = result;
   
-    // If no destination or dropped in the same position, do nothing
-    if (!destination || 
-        (destination.droppableId === source.droppableId && 
-         destination.index === source.index)) {
+    if (!destination) {
+      console.log("Dropped outside a droppable area");
       return;
     }
   
-    // Create a deep copy of columns to modify
-    const newColumns = columns.map(column => ({
-      ...column,
-      tasks: [...column.tasks]
-    }));
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      console.log("Dropped in the same position");
+      return;
+    }
   
-    // Find the source and destination column indices
-    const sourceColumnIndex = newColumns.findIndex(
-      column => column.id === source.droppableId
-    );
-    const destColumnIndex = newColumns.findIndex(
-      column => column.id === destination.droppableId
-    );
+    // Find source and destination columns
+    const sourceColumn = columns.find((col) => col.id === source.droppableId);
+    const destinationColumn = columns.find((col) => col.id === destination.droppableId);
   
-    // Remove the dragged task from the source column
-    const [removedTask] = newColumns[sourceColumnIndex].tasks.splice(
-      source.index, 
-      1
-    );
+    if (!sourceColumn || !destinationColumn) {
+      console.log("Source or destination column not found");
+      return;
+    }
   
-    // Insert the task into the destination column at the specified index
-    newColumns[destColumnIndex].tasks.splice(
-      destination.index, 
-      0, 
-      removedTask
-    );
+    // Move task
+    const [movedTask] = sourceColumn.tasks.splice(source.index, 1);
+    destinationColumn.tasks.splice(destination.index, 0, movedTask);
   
-    // Update the state with the new columns
-    setColumns(newColumns);
+    setColumns([...columns]);
   };
+  
+  
   
 
   return (

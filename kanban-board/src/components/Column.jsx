@@ -8,7 +8,6 @@ const Column = ({
   onAddTask,
   onEditTask,
   onDeleteTask,
-  onMoveTask, // Add this prop to handle task movement
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(column.title);
@@ -28,6 +27,7 @@ const Column = ({
       onEditTitle(column.id, newTitle);
     }
   };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleSaveTitle();
   };
@@ -91,7 +91,7 @@ const Column = ({
             </h3>
             <button
               onClick={onDelete}
-              className=" hover:bg-red-600 hover:rounded-full w-[40px] h-[40px]"
+              className="hover:bg-red-600 hover:rounded-full w-[40px] h-[40px]"
             >
               <i className="ri-delete-bin-line text-xl"></i>
             </button>
@@ -138,82 +138,85 @@ const Column = ({
           </button>
         )}
 
-        {column.tasks.length === 0 ? (
-          <p className="text-gray-500 mt-6">No tasks in this column</p>
-        ) : (
-          <Droppable droppableId={column.id}>
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="mt-4"
-              >
-                {column.tasks.map((task, idx) => (
-                  <Draggable
-                    key={`${column.id}-${task.name}-${idx}`}
-                    draggableId={`${column.id}-${task.name}-${idx}`}
-                    index={idx}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="bg-gray-700 text-white p-2 mb-2 mt-4 rounded-md"
+        <Droppable droppableId={column.id} type="TASK">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`mt-4 p-4 rounded-md border-2 ${
+                snapshot.isDraggingOver ? "bg-blue-200" : "bg-gray-800"
+              } ${column.tasks.length === 0 ? "border-dashed h-[100px]" : ""}`}
+            >
+              {column.tasks.length === 0 ? (
+                <p className="text-gray-500 text-center">Drop tasks here</p>
+              ) : (
+                column.tasks.map((task, idx) =>
+                  editingTaskIdx === idx ? (
+                    <div
+                      key={idx}
+                      className="bg-gray-700 text-white p-2 mb-2 rounded-md"
+                    >
+                      <input
+                        type="text"
+                        value={editedTaskName}
+                        onChange={(e) => setEditedTaskName(e.target.value)}
+                        className="w-full p-2 mb-2 rounded-md bg-transparent border-2 border-emerald-600"
+                      />
+                      <textarea
+                        value={editedTaskDescription}
+                        onChange={(e) =>
+                          setEditedTaskDescription(e.target.value)
+                        }
+                        className="w-full p-2 mb-2 rounded-md bg-transparent border-2 border-emerald-600"
+                      />
+                      <button
+                        onClick={handleSaveEditedTask}
+                        className="w-full py-2 bg-green-500 text-white rounded-md mt-2"
                       >
-                        {editingTaskIdx === idx ? (
-                          <div>
-                            <input
-                              type="text"
-                              value={editedTaskName}
-                              onChange={(e) =>
-                                setEditedTaskName(e.target.value)
-                              }
-                              className="w-full p-2 mb-2 text-black rounded-md"
-                            />
-                            <textarea
-                              value={editedTaskDescription}
-                              onChange={(e) =>
-                                setEditedTaskDescription(e.target.value)
-                              }
-                              className="w-full p-2 mb-2 text-black rounded-md"
-                            />
+                        Save
+                      </button>
+                    </div>
+                  ) : (
+                    <Draggable
+                      key={`${column.id}-${task.name}-${idx}`}
+                      draggableId={`${column.id}-${task.name}-${idx}`}
+                      index={idx}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={`bg-gray-700 text-white p-2 mb-2 rounded-md ${
+                            snapshot.isDragging ? "opacity-75" : "opacity-100"
+                          }`}
+                        >
+                          <h4 className="font-semibold">{task.name}</h4>
+                          <p>{task.description}</p>
+                          <div className="flex justify-between mt-2">
                             <button
-                              onClick={handleSaveEditedTask}
-                              className="w-full py-2 bg-emerald-500 text-white rounded-md mt-2"
+                              onClick={() => handleEditTask(idx)}
+                              className="hover:bg-yellow-600 w-[40px] h-[40px] hover:rounded-full text-yellow-600 hover:text-white"
                             >
-                              Save
+                              <i className="ri-edit-2-line text-xl"></i>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTask(idx)}
+                              className="hover:bg-red-500 w-[40px] h-[40px] hover:rounded-full text-red-600 hover:text-white "
+                            >
+                              <i className="ri-delete-bin-line text-xl"></i>
                             </button>
                           </div>
-                        ) : (
-                          <div>
-                            <h4 className="font-semibold">{task.name}</h4>
-                            <p>{task.description}</p>
-                            <div className="flex justify-between mt-2">
-                              <button
-                                onClick={() => handleEditTask(idx)}
-                                className="hover:bg-yellow-600 w-[40px] h-[40px] hover:rounded-full text-yellow-600 hover:text-white"
-                              >
-                                <i className="ri-edit-2-line text-xl"></i>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteTask(idx)}
-                                className="hover:bg-red-500 w-[40px] h-[40px] hover:rounded-full text-red-600 hover:text-white "
-                              >
-                                <i className="ri-delete-bin-line text-xl"></i>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        )}
+                        </div>
+                      )}
+                    </Draggable>
+                  )
+                )
+              )}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
       </div>
     </div>
   );
