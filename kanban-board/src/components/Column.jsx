@@ -19,6 +19,7 @@ const Column = ({
 
   const handleTitleClick = () => setIsEditing(true);
   const handleTitleChange = (e) => setNewTitle(e.target.value);
+
   const handleSaveTitle = () => {
     setIsEditing(false);
     if (newTitle.trim() && newTitle !== column.title) {
@@ -35,6 +36,8 @@ const Column = ({
       setTaskName("");
       setTaskDescription("");
       setIsAddingTask(false);
+    }else{
+      alert("Both Task Title and Description are required")
     }
   };
 
@@ -73,7 +76,7 @@ const Column = ({
             onChange={handleTitleChange}
             onBlur={handleSaveTitle}
             onKeyPress={handleKeyPress}
-            className="text-xl font-semibold text-white bg-transparent border-none outline-none focus:ring-slate-50"
+            className="text-xl font-semibold text-white bg-transparent border-2 border-emerald-600 outline-none px-4 py-2"
             autoFocus
           />
         ) : (
@@ -84,7 +87,10 @@ const Column = ({
             >
               {column.title}
             </h3>
-            <button onClick={onDelete}>
+            <button
+              onClick={onDelete}
+              className=" hover:bg-red-600 hover:rounded-full w-[40px] h-[40px]"
+            >
               <i className="ri-delete-bin-line text-xl"></i>
             </button>
           </div>
@@ -92,27 +98,20 @@ const Column = ({
       </div>
 
       <div className="mt-4">
-        {!isAddingTask ? (
-          <button
-            onClick={() => setIsAddingTask(true)}
-            className="w-full py-2 bg-emerald-500 text-white rounded-md mt-2"
-          >
-            Add Task
-          </button>
-        ) : (
+        {isAddingTask ? (
           <div className="mb-4">
             <input
               type="text"
               placeholder="Task Name"
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
-              className="w-full p-2 mb-2 text-black rounded-md"
+              className="w-full p-2 mb-2 text-white rounded-md bg-transparent border-2 border-transparent focus:border-emerald-600 focus:outline-none"
             />
             <textarea
               placeholder="Task Description"
               value={taskDescription}
               onChange={(e) => setTaskDescription(e.target.value)}
-              className="w-full p-2 mb-2 text-black rounded-md"
+              className="w-full p-2 mb-2 text-white rounded-md bg-transparent border-2 border-transparent focus:border-emerald-600 focus:outline-none"
             />
             <button
               onClick={handleAddTask}
@@ -120,7 +119,21 @@ const Column = ({
             >
               Add Task
             </button>
+            {/* Close button to cancel adding task */}
+            <button
+              onClick={() => setIsAddingTask(false)}
+              className="w-full py-2 mt-2 text-red-600 hover:text-white hover:bg-red-600 border-2 border-red-600 rounded-md"
+            >
+              Close
+            </button>
           </div>
+        ) : (
+          <button
+            onClick={() => setIsAddingTask(true)}
+            className="w-full py-2 bg-emerald-500 text-white rounded-md mt-2"
+          >
+            Add Task
+          </button>
         )}
 
         {column.tasks.length === 0 ? (
@@ -158,13 +171,13 @@ const Column = ({
                   <div className="flex justify-between mt-2">
                     <button
                       onClick={() => handleEditTask(idx)}
-                      className="text-blue-400"
+                      className="hover:bg-yellow-600 w-[40px] h-[40px] hover:rounded-full text-yellow-600 hover:text-white"
                     >
                       <i className="ri-edit-2-line text-xl"></i>
                     </button>
                     <button
                       onClick={() => handleDeleteTask(idx)}
-                      className="text-red-500"
+                      className="hover:bg-red-500 w-[40px] h-[40px] hover:rounded-full text-red-600 hover:text-white "
                     >
                       <i className="ri-delete-bin-line text-xl"></i>
                     </button>
